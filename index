@@ -1,0 +1,202 @@
+<?php require_once 'CORE/dbConfig.php'; ?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+	
+	<!-- selecting all peripherals from the table-->
+	<?php
+	$stmt = $pdo->prepare("SELECT * FROM peripherals");
+	if ($stmt->execute()) {
+		echo "<pre>";
+		print_r($stmt->fetchALL());
+		echo"<pre";
+
+	}
+	?>
+
+</body>
+</html>
+
+--------------------------------
+<?php require_once 'CORE/dbConfig.php'; ?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+	
+	<!-- selecting details from id number 4-->
+	<?php
+	$stmt = $pdo->prepare("SELECT * FROM peripherals WHERE PeripheralID = 4");
+	if ($stmt->execute()) {
+		echo "<pre>";
+		print_r($stmt->fetch());
+		echo"<pre";
+
+	}
+	?>
+
+</body>
+</html>
+
+--------------------------
+<?php require_once 'CORE/dbConfig.php'; ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Insert Peripheral</title>
+</head>
+<body>
+	
+	<!-- Inserting a new peripheral into the peripherals table-->
+	<?php
+	$query = "INSERT INTO peripherals (PeripheralID, PeripheralName, PeripheralType) VALUES (?, ?, ?)";
+
+	$stmt = $pdo->prepare($query);
+
+	$executeQuery = $stmt->execute([11, "Microphone Stand", "Accessory"]);
+
+	if ($executeQuery) {
+		echo "Query Successful!";
+	} else {
+		echo "Query failed: ";
+	}
+	?>
+	
+</body>
+</html>
+
+-------------------
+<?php require_once 'CORE/dbConfig.php'; ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Insert Peripheral</title>
+</head>
+<body>
+	
+	<!-- Deleting a peripheral into the peripherals table-->
+	<?php
+	$query = "DELETE FROM peripherals WHERE PeripheralID = 11";
+
+	$stmt = $pdo->prepare($query);
+
+	$executeQuery = $stmt->execute();
+
+	if ($executeQuery) {
+		echo "DELETION Successful!";
+	} else {
+		echo "Query failed: ";
+	}
+	?>
+	
+</body>
+</html>
+
+-----------------------------
+<?php require_once 'CORE/dbConfig.php'; ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Update Peripherals</title>
+</head>
+<body>
+	
+	<h1>Update Peripherals</h1>
+
+	<?php
+	// Array of peripherals to update (PeripheralID => [new name, new type])
+	$peripheralsToUpdate = [
+		1 => ['Mechanical Keyboard', 'Input'],
+		2 => ['27-inch Monitor', 'Display'],
+		3 => ['Wireless Mouse', 'Input']
+	];
+
+	// Prepare the update query
+	$query = "UPDATE Peripherals SET PeripheralName = ?, PeripheralType = ? WHERE PeripheralID = ?";
+	$stmt = $pdo->prepare($query);
+
+	// Loop through the array to update each peripheral
+	foreach ($peripheralsToUpdate as $peripheralId => $data) {
+		$newPeripheralName = $data[0];
+		$newPeripheralType = $data[1];
+
+		$executeQuery = $stmt->execute([$newPeripheralName, $newPeripheralType, $peripheralId]);
+
+		if ($executeQuery) {
+			echo "<p>Peripheral ID $peripheralId updated successfully!</p>";
+		} else {
+			echo "<p>Update failed for Peripheral ID $peripheralId: " . implode(", ", $stmt->errorInfo()) . "</p>";
+		}
+	}
+	?>
+	
+</body>
+</html>
+
+-----------------------
+<?php require_once 'CORE/dbConfig.php'; ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Input Peripherals</title>
+	<style>
+		table { width: 100%; border-collapse: collapse; }
+		th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+		th { background-color: #f2f2f2; }
+	</style>
+</head>
+<body>
+	
+	<h1>Peripherals of Type "Input"</h1>
+
+	<table>
+		<tr>
+			<th>Peripheral ID</th>
+			<th>Peripheral Name</th>
+			<th>Peripheral Type</th>
+		</tr>
+
+		<?php
+		// Query to select peripherals where PeripheralType is 'Input'
+		$query = "SELECT PeripheralID, PeripheralName, PeripheralType FROM Peripherals WHERE PeripheralType = ?";
+		$stmt = $pdo->prepare($query);
+		$stmt->execute(['Input']);
+
+		// Fetch and display results
+		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			echo "<tr>";
+			echo "<td>" . htmlspecialchars($row['PeripheralID']) . "</td>";
+			echo "<td>" . htmlspecialchars($row['PeripheralName']) . "</td>";
+			echo "<td>" . htmlspecialchars($row['PeripheralType']) . "</td>";
+			echo "</tr>";
+		}
+		?>
+	</table>
+
+</body>
+</html>
